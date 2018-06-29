@@ -55,7 +55,7 @@ public class LDA extends AbstractIndexBuilder<WordVector> implements LearningMod
 
 	public LDA(int id) throws SupportADNException {
 		super(id);
-		supportADN = new HashMap<String, Class<?>>();
+
 		supportADN.put("K", Integer.class);
 		supportADN.put("Alpha", Double.class);
 		supportADN.put("Beta", Double.class);
@@ -72,6 +72,8 @@ public class LDA extends AbstractIndexBuilder<WordVector> implements LearningMod
 
 	@Override
 	public void initADN() throws Exception {
+		super.initADN();
+		
 		int tempK = Integer.parseInt(getModel().getProcessOption(id, InferenceLDA_Parameter.K.getName()));
 		getCurrentProcess().getADN().putParameter(new Parameter<Integer>(InferenceLDA_Parameter.K.getName(), tempK));
 		getCurrentProcess().getADN().getParameter(Integer.class, InferenceLDA_Parameter.K.getName())
@@ -201,7 +203,7 @@ public class LDA extends AbstractIndexBuilder<WordVector> implements LearningMod
 	}
 
 	public static void writeTempInputFile(String modelName, String corpusId, List<Corpus> listCorpus, WordFilter filter,
-			String outputPath) throws IOException {
+			String outputPath) throws Exception {
 		new File(outputPath + File.separator + "modelLDA").mkdir();
 
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
@@ -246,7 +248,7 @@ public class LDA extends AbstractIndexBuilder<WordVector> implements LearningMod
 
 	public synchronized static Model ldaModelLearning(String modelName, String corpusId, List<Corpus> listCorpus,
 			WordFilter filter, boolean forceWriting, int K, double alpha, double beta, String outputPath)
-			throws IOException {
+			throws Exception {
 		LDACmdOption option = new LDACmdOption();
 		Estimator estimator;
 

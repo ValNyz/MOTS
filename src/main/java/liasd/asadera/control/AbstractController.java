@@ -1,6 +1,7 @@
 package main.java.liasd.asadera.control;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import main.java.liasd.asadera.model.AbstractModel;
 import main.java.liasd.asadera.model.task.postProcess.AbstractPostProcess;
@@ -21,6 +25,8 @@ import main.java.liasd.asadera.textModeling.MultiCorpus;
 import main.java.liasd.asadera.view.AbstractView;
 
 public abstract class AbstractController {
+	
+	private static Logger logger = LoggerFactory.getLogger(AbstractController.class);
 
 	private final AbstractModel model;
 	private final AbstractView view;
@@ -91,7 +97,7 @@ public abstract class AbstractController {
 	}
 
 	public void notifyMultiThreadBoolChanged(boolean multithread) {
-		System.out.println("Multithread " + multithread);
+		logger.info("Multithread " + multithread);
 		getModel().setMultiThreading(multithread);
 	}
 
@@ -101,7 +107,7 @@ public abstract class AbstractController {
 	}
 
 	public final void notifyCorpusChanged(String summaryInputPath, List<String> summaryNames, String inputCorpusPath,
-			List<String> docNames) {
+			List<String> docNames) throws FileNotFoundException {
 		Set<String> set_docNames = new TreeSet<String>();
 		Set<String> set_summaryNames = new TreeSet<String>();
 
@@ -134,6 +140,33 @@ public abstract class AbstractController {
 			corpus.setSummaryPath(summaryInputPath);
 			currentMultiCorpus.add(corpus);
 		}
+		else
+			throw new FileNotFoundException("File " + inputCorpusPath + " not found.");
+	}
+	
+	public final void notifyCorpusChanged(String inputCorpusPath,
+			List<String> docNames) throws FileNotFoundException {
+		Set<String> set_docNames = new TreeSet<String>();
+
+		File f = new File(inputCorpusPath);
+		if (f.exists()) {
+			List<String> lf = Arrays.asList(f.list());
+			for (String doc : docNames) {
+				Pattern pattern = Pattern.compile(doc);
+				set_docNames.addAll(lf.stream().filter(pattern.asPredicate()).collect(Collectors.toSet()));
+			}
+			docNames.clear();
+			docNames.addAll(set_docNames);
+
+			Corpus corpus = new Corpus(currentMultiCorpus.size());
+
+			corpus.setModel(model);
+			corpus.setDocNames(docNames);
+			corpus.setInputPath(inputCorpusPath);
+			currentMultiCorpus.add(corpus);
+		}
+		else
+			throw new FileNotFoundException("Corpus folder " + inputCorpusPath + " not found.");
 	}
 
 	public void notifyOutputPathChanged(String outputDir) {

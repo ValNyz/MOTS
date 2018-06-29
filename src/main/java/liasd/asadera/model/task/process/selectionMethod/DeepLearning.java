@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Properties;
 
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import main.java.liasd.asadera.model.task.preProcess.stanfordNLP.StanfordNLPSimplePreProcess;
+import main.java.liasd.asadera.model.task.preProcess.StanfordNLPPreProcess;
 import main.java.liasd.asadera.model.task.process.indexBuilder.IndexBasedIn;
 import main.java.liasd.asadera.model.task.process.processCompatibility.ParameterizedMethod;
 import main.java.liasd.asadera.optimize.SupportADNException;
@@ -28,11 +28,9 @@ public class DeepLearning extends AbstractSelectionMethod implements IndexBasedI
 
 	@Override
 	public AbstractSelectionMethod makeCopy() throws Exception {
-		return null;
-	}
-
-	@Override
-	public void initADN() throws Exception {
+		DeepLearning p = new DeepLearning(id);
+		initCopy(p);
+		return p;
 	}
 
 	@Override
@@ -46,7 +44,7 @@ public class DeepLearning extends AbstractSelectionMethod implements IndexBasedI
 		props = new Properties();
 		props.put("annotators", propStanfordNLP);
 		pipeline = new StanfordCoreNLP(props);
-		List<SentenceModel> summary = StanfordNLPSimplePreProcess.liveProcessToListSentenceModel(propStanfordNLP, pipeline, textSummary);
+		List<SentenceModel> summary = StanfordNLPPreProcess.liveProcessToListSentenceModel(propStanfordNLP, pipeline, textSummary);
 		updateIndex(summary);
 		return summary;
 	}

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import main.java.liasd.asadera.exception.LacksOfFeatures;
 import main.java.liasd.asadera.model.task.process.AbstractProcess;
 import main.java.liasd.asadera.model.task.process.processCompatibility.ParameterizedMethod;
@@ -19,6 +22,8 @@ import main.java.liasd.asadera.tools.reader_writer.Reader;
 public abstract class AbstractIndexBuilder<T extends WordIndex> extends ParameterizedMethod
 		implements IndexBasedOut<T>, ListSentenceBasedOut {
 
+	private static Logger logger = LoggerFactory.getLogger(AbstractIndexBuilder.class);
+
 	private AbstractProcess currentProcess;
 	protected final Index<T> index;
 
@@ -28,7 +33,7 @@ public abstract class AbstractIndexBuilder<T extends WordIndex> extends Paramete
 	public AbstractIndexBuilder(int id) throws SupportADNException {
 		super(id);
 		index = new Index<T>();
-		listSen = new ArrayList<SentenceModel>();
+		
 		listParameterOut.add(new ParameterizedType(SentenceModel.class, List.class, ListSentenceBasedOut.class));
 	}
 
@@ -47,7 +52,9 @@ public abstract class AbstractIndexBuilder<T extends WordIndex> extends Paramete
 		p.setModel(model);
 	}
 
-	public abstract void initADN() throws Exception;
+	public void initADN() throws Exception {
+		listSen = new ArrayList<SentenceModel>();
+	}
 
 	public void processIndex(List<Corpus> listCorpus) throws Exception {
 		try {
@@ -69,7 +76,7 @@ public abstract class AbstractIndexBuilder<T extends WordIndex> extends Paramete
 						try {
 							listSen.add(corpus.getSentenceByID(Integer.parseInt(line)));
 						} catch (Exception e) {
-							System.out.println(folder[i].getPath());
+							logger.error(folder[i].getPath());
 						}
 					reader.close();
 				}

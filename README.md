@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/ToolAutomaticSum/MOTS.svg?branch=master)](https://travis-ci.org/ToolAutomaticSum/MOTS)
-[![Wiki](https://img.shields.io/badge/docs-wiki-orange.svg)](https://toolautomaticsum.github.io/MOTS/)
+[![Docs](https://img.shields.io/badge/java-docs-yellow.svg)](https://toolautomaticsum.github.io/MOTS/)
+[![Wiki](https://img.shields.io/badge/MOTS-wiki-orange.svg)](https://github.com/ToolAutomaticSum/MOTS/wiki)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # MOTS
@@ -14,30 +15,31 @@ MOTS (MOdular Tool for Summarization) is a summarization system, written in Java
 ### Prerequisites
 
 * [Maven](https://maven.apache.org/) - Dependency Manager
-* At least python 2.7 in order to use WordEmbeddings
-* [jep](https://github.com/ninia/jep) in order to use WordEmbeddings (pip install jep)
-* [gensim](https://radimrehurek.com/gensim/) in order to use WordEmbeddings (pip install gensim)
+* glpk-utils in order to use ILP (sudo apt-get install glpk-utils)
+* At least python3 in order to use WordEmbeddings, make sure to have an updated version of pip3 (sudo pip3 install --upgrade pip)
+* [gensim](https://radimrehurek.com/gensim/) in order to use WordEmbeddings (pip3 install gensim --user)
+* [jep](https://github.com/ninia/jep) in order to use WordEmbeddings (pip3 install jep --user)
 
 
 ### Installing
 
-* Define $JAVA_HOME to your java home folder.
 * You might define $CORPUS_DATA to your DUC/TAC folder.
-* Define $JEP_HOME to your folder containing your jep python package. It should be /usr/lib/pythonX.Y/site-packages/jep or $HOME/.local/lib/pythonX.Y/site-packages/jep"
 * Install ROUGE :
-	* Define $ROUGE_HOME to your ROUGE installation folder.
-	* Define $ROUGE_EVAL_HOME to $ROUGE_HOME/data.
+	* Define $ROUGE_HOME to your ROUGE installation folder (or to ./ROUGE-1.5.5/RELEASE-1.5.5).
 	* Install XML::DOM module in order to use ROUGE perl script. (sudo cpan install XML::DOM).
-	* Recreate database :
-	```
-	cd data/WordNet-2.0-Exceptions/
-	rm WordNet-2.0.exc.db # only if exist
-	perl buildExeptionDB.pl . exc WordNet-2.0.exc.db
+	* Run ./install_rouge.sh
+	or :
+		* Define $ROUGE_EVAL_HOME to $ROUGE_HOME/data.
+		* Recreate database :
+		```
+		cd data/WordNet-2.0-Exceptions/
+		rm WordNet-2.0.exc.db # only if exist
+		perl buildExeptionDB.pl . exc WordNet-2.0.exc.db
 
-	cd ..
-	rm WordNet-2.0.exc.db # only if exist
-	ln -s WordNet-2.0-Exceptions/WordNet-2.0.exc.db WordNet-2.0.exc.db
-	```
+		cd ..
+		rm WordNet-2.0.exc.db # only if exist
+		ln -s WordNet-2.0-Exceptions/WordNet-2.0.exc.db WordNet-2.0.exc.db
+		```
 * Run install.sh script.
 
 ### Usage
@@ -45,13 +47,13 @@ MOTS (MOdular Tool for Summarization) is a summarization system, written in Java
 MOTS is a command line tool than can be used like this :
 
 ```
-./MOTS mots.X.Y.Z.jar -c <config_file> -m <multicorpus_file>
+./MOTS mots.X.Y.Z.jar -c <config_file> -m <multicorpus_file> -v <OPTIONAL>
 ```
 
 MOTS script encapsulate some environnement variable needed for the execution of WordEmbeddings. If you don't use WordEmbeddings you could launch via :
 
 ```
-java -jar mots.X.Y.Z.jar -c <config_file> -m <multicorpus_file>
+java -jar mots.X.Y.Z.jar -c <config_file> -m <multicorpus_file> -v <OPTIONAL>
 ```
 
 Example config file and multicorpus file are provided in /conf but should be adapted to your setup.
@@ -103,7 +105,7 @@ Example for LexRank_MMR configuration file :
 
 * <b>\<CONFIG\></b> is the root node.
 	* <b>\<TASK\></b> represent a summarization task. You could do multiple in a simple run. At start, stick with one.
-		* <b>\<LANGUAGE\></b> is the input's document language for preprocessing goal. USELESS AT THE MOMENT.
+		* <b>\<LANGUAGE\></b> is the input's document language for preprocessing goal. (english / french for now) 
 		* <b>\<OUTPUT_PATH\></b> is the forlder's output path of the system. It is used to save preprocessed documents, ROUGE xml generated file, old score, ...
 		* <b>\<MULTITHREADING\></b> (boolean) launch the system in a mutltithreading way or not.
 		* <b>\<PREPROCESS\></b> is the preprocess step for the system. The preprocess java class to use is pass by the name variable. Here it's GenerateTextModel. It also needs two <b>\<OPTION\></b> :

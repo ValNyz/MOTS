@@ -16,6 +16,7 @@ import main.java.liasd.asadera.model.task.preProcess.AbstractPreProcess;
 import main.java.liasd.asadera.model.task.process.AbstractProcess;
 import main.java.liasd.asadera.textModeling.Corpus;
 import main.java.liasd.asadera.textModeling.MultiCorpus;
+import main.java.liasd.asadera.tools.wordFilters.WordFilter;
 
 /**
  * Represent an automatic summarizatin system split in 3 steps :
@@ -59,6 +60,11 @@ public abstract class AbstractModel extends Observable {
 	 * List of Map of ids (from @processIDs)
 	 */
 	private List<Map<String, String>> processOption = new ArrayList<Map<String, String>>();
+	
+	/**
+	 * Filter dertimining which words are to be considering as Stopwords
+	 */
+	private WordFilter filter;
 
 	/**
 	 * List of MultiCorpus
@@ -70,6 +76,8 @@ public abstract class AbstractModel extends Observable {
 	private boolean bMultiThreading = false;
 
 	private boolean bRougeEvaluation = false;
+	
+	private boolean isVerbose = false;
 
 	private EvaluationROUGE evalRouge;
 
@@ -196,26 +204,6 @@ public abstract class AbstractModel extends Observable {
 		this.processOption = processOption;
 	}
 
-	@Deprecated
-	public Map<String, Integer> getProcessIDs() {
-		return processIDs;
-	}
-
-	@Deprecated
-	public AbstractProcess getProcessByID(int ID) {
-		AbstractProcess returnProcess = null;
-		boolean notFind = true;
-		Iterator<AbstractProcess> it = process.iterator();
-		while (notFind && it.hasNext()) {
-			AbstractProcess p = it.next();
-			if (p.getId() == ID) {
-				returnProcess = p;
-				notFind = false;
-			}
-		}
-		return returnProcess;
-	}
-
 	/**
 	 * Get the AbstractProcess's list. i.e. Comparative/Learning/Summarize 
 	 * @return List<AbstractProcess>
@@ -223,6 +211,14 @@ public abstract class AbstractModel extends Observable {
 	 */
 	public List<AbstractProcess> getProcess() {
 		return process;
+	}
+
+	public WordFilter getFilter() {
+		return filter;
+	}
+
+	public void setFilter(WordFilter filter) {
+		this.filter = filter;
 	}
 
 	/**
@@ -262,18 +258,7 @@ public abstract class AbstractModel extends Observable {
 	public List<MultiCorpus> getMultiCorpusModels() {
 		return multiCorpusModels;
 	}
-
-	@Deprecated
-	public void setCurrentMultiCorpus(MultiCorpus currentMultiCorpus) {
-		this.currentMultiCorpus = currentMultiCorpus;
-		for (AbstractPreProcess pre : preProcess)
-			pre.setCurrentMultiCorpus(currentMultiCorpus);
-		for (AbstractProcess p : process)
-			p.setCurrentMultiCorpus(currentMultiCorpus);
-		for (AbstractPostProcess post : postProcess)
-			post.setCurrentMultiCorpus(currentMultiCorpus);
-	}
-
+	
 	/**
 	 * Get EvaluationROUGE's instance to evaluate generated summaries
 	 * @return {@link EvaluationROUGE} evalRouge
@@ -302,6 +287,14 @@ public abstract class AbstractModel extends Observable {
 		return bMultiThreading;
 	}
 
+	public boolean isVerbose() {
+		return isVerbose;
+	}
+
+	public void setVerbose(boolean isVerbose) {
+		this.isVerbose = isVerbose;
+	}
+
 	/** Clear instance's attribute.
 	 * Useful especially for genetic algorithm.
 	 */
@@ -312,7 +305,6 @@ public abstract class AbstractModel extends Observable {
 
 		process.clear();
 		preProcess.clear();
-		processIDs.clear();
 		processOption.clear();
 		multiCorpusModels.clear();
 	}

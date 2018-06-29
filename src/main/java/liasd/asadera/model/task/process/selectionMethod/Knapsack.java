@@ -3,6 +3,9 @@ package main.java.liasd.asadera.model.task.process.selectionMethod;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import main.java.liasd.asadera.model.task.process.processCompatibility.ParameterizedMethod;
 import main.java.liasd.asadera.model.task.process.selectionMethod.scorer.Scorer;
 import main.java.liasd.asadera.optimize.SupportADNException;
@@ -12,8 +15,14 @@ import main.java.liasd.asadera.textModeling.Summary;
 
 public class Knapsack extends AbstractSelectionMethod {
 
+	private static Logger logger = LoggerFactory.getLogger(Knapsack.class);
+
 	private int K;
 	private Scorer scorer;
+
+	public void setScorer(Scorer scorer) {
+		this.scorer = scorer;
+	}
 
 	public Knapsack(int id) throws SupportADNException {
 		super(id);
@@ -28,6 +37,8 @@ public class Knapsack extends AbstractSelectionMethod {
 
 	@Override
 	public void initADN() throws Exception {
+		super.initADN();
+		
 		K = Integer.parseInt(getCurrentProcess().getModel().getProcessOption(id, "Size"));
 
 		String sco = getCurrentProcess().getModel().getProcessOption(id, "ScoreMethod");
@@ -76,13 +87,13 @@ public class Knapsack extends AbstractSelectionMethod {
 				bestK = k;
 			}
 		}
-		System.out.println(bestScore);
+		logger.trace(String.valueOf(bestScore));
 		return s[n][bestK];
 	}
 
 	@Override
 	public boolean isOutCompatible(ParameterizedMethod compatibleMethod) {
-		return false;
+		return compatibleMethod.isOutCompatible(scorer);
 	}
 
 	@Override
